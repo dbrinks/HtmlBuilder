@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace HtmlBuilder
 {
@@ -40,10 +41,17 @@ namespace HtmlBuilder
             //REGEX_CLASS_SELECTORS = /(\.[_a-z]+[_a-z0-9-:\\]*)/ig;
             //REGEX_ATTR_SELECTORS = /(\[\s*[_a-z0-9-:\.\|\\]+\s*(?:[~\|\*\^\$]?=\s*[\"\'][^\"\']*[\"\'])?\s*\])/ig;
 
-            if (Selector.Contains('.'))
+            var classRegex = new Regex(@"(\.[_a-z]+[_a-z0-9-:\\]*)", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            var classes = classRegex.Matches(Selector);
+
+            if (classes.Count > 0)
             {
-                var index = Selector.IndexOf('.') + 1;
-                element.ClassName = Selector.SubstringUntil(index, _specialCharacters);
+                var classString =
+                    classes.Cast<object>().Aggregate(string.Empty,
+                        (current, c) =>
+                            current + (c.ToString().Replace(".", "") + " ")
+                    );
+                element.ClassName = classString.Trim();
             }
 
             return element.ToString();

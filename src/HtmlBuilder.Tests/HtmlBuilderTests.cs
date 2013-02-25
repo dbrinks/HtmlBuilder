@@ -10,7 +10,9 @@ namespace HtmlBuilder.Tests
         private const string _div = "div";
         private const string _span = "span";
         private const string _class = "test-class";
+        private const string _class2 = "test-class2";
         private const string _cssClass = ".test-class";
+        private const string _cssClass2 = ".test-class2";
 
         [TestInitialize]
         public void TestInitialize()
@@ -57,5 +59,14 @@ namespace HtmlBuilder.Tests
 
             Assert.AreEqual("<" + _span + " class=\"" + _class + "\"></" + _span + ">", html.ToString());
         }
+
+        [TestMethod]
+        public void HtmlBuilder_MultipleClasses_RendersDivWithMultipleClasses()
+        {
+            var html = new HtmlBuilder(_cssClass + " " + _cssClass2);
+
+            Assert.AreEqual("<div class=\"" + _class + " " + _class2 + "\"></div>", html);
+        }
     }
 }
+
