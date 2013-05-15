@@ -50,5 +50,15 @@ namespace HtmlBuilder
                 ? str.Substring(index, end)
                 : str.Substring(index, str.Length - index);
         }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static string ReplaceQuotes(this string str)
+        {
+            return str.Replace("\'", "").Replace("\"", "");
+        }
     }
 }

@@ -5,31 +5,107 @@ using System.Text.RegularExpressions;
 
 namespace HtmlBuilder
 {
-    public static class SelectorParser
+    public class SelectorParser
     {
-        private static readonly char[] _specialCharacters = new[] { '#', '.', '[', ']', '\'', '\"', '=', '>', '{', '}' };
+        private static readonly char[] _specialCharacters = new[] { '#', '.', '[', ']', '>', '{', '}', '*', '+' };
         private static readonly Regex _idRegex = new Regex(@"#([a-zA-Z0-9_\-]+)", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+        private static readonly Regex _textRegex = new Regex(@"\{(.+)\}", RegexOptions.IgnoreCase | RegexOptions.Singleline);
         private static readonly Regex _classRegex = new Regex(@"\.([a-zA-Z0-9_\-]+)", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+        private static readonly Regex _countRegex = new Regex(@"\*\s*[0-9]+", RegexOptions.Singleline);
         private static readonly Regex _attributeRegex = new Regex(@"\[([^\]~\$\*\^\|\!]+)(=[^\]]+)?\]", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+
+        public SelectorParser() { }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="selector"></param>
         /// <returns></returns>
-        public static Element Parse(string selector)
+        public List<HtmlElement> Parse(string selector)
         {
-            //var selectorChunks = selector.Split(new[] { ' ', '>' });
+            var elements = new List<HtmlElement>();
+            List<HtmlElement> children = null;
+            List<HtmlElement> siblings = null;
 
-            var element = new Element
+            selector = selector.Trim();
+
+            var childSelectorIndex = selector.IndexOf('>');
+
+            if (childSelectorIndex >= 0)
+            {
+                children = Parse(selector.Substring(childSelectorIndex + 1));
+                selector = selector.Substring(0, childSelectorIndex).Trim();
+            }
+
+            var siblingSelectorIndex = selector.IndexOf('+');
+
+            if (siblingSelectorIndex >= 0)
+            {
+                siblings = Parse(selector.Substring(siblingSelectorIndex + 1));
+                selector = selector.Substring(0, siblingSelectorIndex).Trim();
+            }
+
+            var count = ParseCount(selector);
+
+            for (var i = 0; i < count; i++)
+            {
+                var element = CreateElement(selector);
+
+                if (children != null)
+                {
+                    element.Children = children;
+                }
+
+                elements.Add(element);
+            }
+
+            if (siblings != null)
+            {
+                elements.AddRange(siblings);
+            }
+
+            return elements;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        private static HtmlElement CreateElement(string selector)
+        {
+            return new HtmlElement
                 {
                     TagName = ParseTag(selector),
                     Id = ParseId(selector),
                     Classes = ParseClasses(selector),
-                    Attributes = ParseAttributes(selector)
+                    Attributes = ParseAttributes(selector),
                 };
+        }
 
-            return element;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        private static int ParseCount(string selector)
+        {
+            var countMatches = _countRegex.Matches(selector);
+
+            if (countMatches.Count > 1)
+            {
+                throw new ArgumentException();
+            }
+
+            var count = 1;
+
+            if (countMatches.Count > 0)
+            {
+                count = int.Parse(countMatches[0].Value.TrimStart('*'));
+            }
+
+            return count;
         }
 
         /// <summary>
@@ -53,7 +129,7 @@ namespace HtmlBuilder
 
             if (idMatches.Count > 1)
             {
-                throw new ArgumentOutOfRangeException("selector", @"The selector provided has more than one ID for a single element.");
+                throw new ArgumentException(@"The selector provided has more than one ID for a single element.", "selector");
             }
 
             return idMatches.Count != 0 ? idMatches[0].Value.TrimStart('#') : string.Empty; // possibly cause weird behavior?
@@ -82,15 +158,6 @@ namespace HtmlBuilder
             var attributePairs = attrMatches.Cast<Match>().Select(m => m.Value.Trim(new[] { '[', ']' })).ToList();
 
             return attributePairs.Select(pair => pair.Split('=')).ToDictionary(s => s[0], s => s.Count() > 1 ? s[1].ReplaceQuotes() : string.Empty);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        private static string ReplaceQuotes(this String str)
-        {
-            return str.Replace("\'", "").Replace("\"", "");
         }
     }
 }

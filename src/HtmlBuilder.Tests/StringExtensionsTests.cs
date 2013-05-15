@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HtmlBuilder.Tests
 {
@@ -23,21 +18,21 @@ namespace HtmlBuilder.Tests
         public void SubstringUntil_HyphenCharacter_ReturnsPrefix()
         {
             var str = _testString.SubstringUntil(0, _hyphenChar);
-            Assert.AreEqual<string>(_testStringPrefix, str);
+            Assert.AreEqual(_testStringPrefix, str);
         }
 
         [TestMethod]
         public void SubstringUntil_HyphenString_ReturnsPrefix()
         {
             var str = _testString.SubstringUntil(0, _hyphenString);
-            Assert.AreEqual<string>(_testStringPrefix, str);
+            Assert.AreEqual(_testStringPrefix, str);
         }
 
         [TestMethod]
         public void SubstringUntil_ExclamationPoint_ReturnsPrefixHyphenSuffix()
         {
             var str = _testString.SubstringUntil(0, _exclamationPoint);
-            Assert.AreEqual<string>(_testStringPrefix + _hyphenString + _space + _testStringSuffix, str);
+            Assert.AreEqual(_testStringPrefix + _hyphenString + _space + _testStringSuffix, str);
         }
 
         [TestMethod]
