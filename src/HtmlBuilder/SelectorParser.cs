@@ -75,12 +75,20 @@ namespace HtmlBuilder
         /// <returns></returns>
         private static HtmlElement CreateElement(string selector)
         {
+            var attr = ParseAttributes(selector);
+            var id = ParseId(selector);
+            var classes = ParseClasses(selector);
+
+            if (!string.IsNullOrEmpty(id))
+                attr.Add("id", id);
+
+            if (!string.IsNullOrEmpty(classes))
+                attr.Add("class", classes);
+
             return new HtmlElement
                 {
                     TagName = ParseTag(selector),
-                    Id = ParseId(selector),
-                    Classes = ParseClasses(selector),
-                    Attributes = ParseAttributes(selector),
+                    Attributes = attr
                 };
         }
 
@@ -140,10 +148,11 @@ namespace HtmlBuilder
         /// </summary>
         /// <param name="selector"></param>
         /// <returns></returns>
-        private static List<string> ParseClasses(string selector)
+        private static string ParseClasses(string selector)
         {
             var classMatches = _classRegex.Matches(selector);
-            return classMatches.Cast<Match>().Select(match => match.Value.TrimStart('.')).ToList();
+
+            return classMatches.Cast<Match>().Aggregate("", (current, match) => current + " " + match.Value.TrimStart('.')).Trim();
         }
 
         /// <summary>

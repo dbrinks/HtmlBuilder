@@ -15,28 +15,28 @@ namespace HtmlBuilder.Tests
         private readonly string _testString = _testStringPrefix + _hyphenString + _space + _testStringSuffix + _exclamationPoint;
 
         [TestMethod]
-        public void SubstringUntil_HyphenCharacter_ReturnsPrefix()
+        public void SubstringUntil_WithHyphenCharacter_ShouldReturnPrefix()
         {
             var str = _testString.SubstringUntil(0, _hyphenChar);
             Assert.AreEqual(_testStringPrefix, str);
         }
 
         [TestMethod]
-        public void SubstringUntil_HyphenString_ReturnsPrefix()
+        public void SubstringUntil_WithHyphenString_ShouldReturnPrefix()
         {
             var str = _testString.SubstringUntil(0, _hyphenString);
             Assert.AreEqual(_testStringPrefix, str);
         }
 
         [TestMethod]
-        public void SubstringUntil_ExclamationPoint_ReturnsPrefixHyphenSuffix()
+        public void SubstringUntil_WithExclamationPoint_ShouldReturnPrefixHyphenSuffix()
         {
             var str = _testString.SubstringUntil(0, _exclamationPoint);
             Assert.AreEqual(_testStringPrefix + _hyphenString + _space + _testStringSuffix, str);
         }
 
         [TestMethod]
-        public void SubstringUntil_CharacterArray_ReturnsPrefixHyphen()
+        public void SubstringUntil_WithCharacterArray_ShouldReturnPrefixHyphen()
         {
             var str = _testString.SubstringUntil(0, _characters);
             Assert.AreEqual(_testStringPrefix + _hyphenChar, str);

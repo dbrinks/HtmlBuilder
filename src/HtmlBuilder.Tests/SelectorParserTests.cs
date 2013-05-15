@@ -47,7 +47,7 @@ namespace HtmlBuilder.Tests
             const string className = "catbug";
             var element = _parser.Parse("." + className).First();
 
-            Assert.AreEqual(className, element.Classes.First());
+            Assert.AreEqual(className, element.Classes);
         }
 
         [TestMethod]
@@ -55,10 +55,11 @@ namespace HtmlBuilder.Tests
         {
             var classes = new List<string> { "gas-powered-stick", "never-runs-out-of-gas" };
             var classString = classes.Aggregate("", (cur, cls) => cur + "." + cls);
+            var expectedString = classes.Aggregate("", (cur, cls) => cur + " " + cls).Trim();
 
             var element = _parser.Parse(classString).First();
 
-            CollectionAssert.AreEqual(classes, element.Classes);
+            Assert.AreEqual(expectedString, element.Classes);
         }
 
         [TestMethod]

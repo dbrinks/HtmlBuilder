@@ -4,15 +4,12 @@ using System.Web.Mvc;
 
 namespace HtmlBuilder
 {
-
     /// <summary>
     /// 
     /// </summary>
     public class HtmlElement
     {
         public string TagName { get; set; }
-        public string Id { get; set; }
-        public List<string> Classes { get; set; }
         public Dictionary<string, string> Attributes { get; set; }
         public List<HtmlElement> Children { get; set; }
 
@@ -25,9 +22,28 @@ namespace HtmlBuilder
         /// <summary>
         /// 
         /// </summary>
+        /// <returns></returns>
+        public string Classes
+        {
+            get { return GetAttribute("class"); }
+            set { Attributes["class"] = value; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public string Id
+        {
+            get { return GetAttribute("id"); }
+            set { Attributes["id"] = value; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public HtmlElement()
         {
-            Classes = new List<string>();
             Attributes = new Dictionary<string, string>();
             Children = new List<HtmlElement>();
         }
@@ -39,16 +55,6 @@ namespace HtmlBuilder
         public TagBuilder ToTagBuilder()
         {
             var tag = new TagBuilder(!string.IsNullOrEmpty(TagName) ? TagName : "div");
-
-            if (!string.IsNullOrEmpty(Id))
-            {
-                tag.MergeAttribute("id", Id);
-            }
-
-            foreach (var cssClass in Classes)
-            {
-                tag.AddCssClass(cssClass);
-            }
 
             tag.MergeAttributes(Attributes);
 
@@ -67,6 +73,21 @@ namespace HtmlBuilder
         public override string ToString()
         {
             return ToTagBuilder().ToString(GetTagRenderMode());
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private string GetAttribute(string key)
+        {
+            string value;
+            Attributes.TryGetValue(key, out value);
+
+            return !string.IsNullOrEmpty(value)
+                ? value
+                : string.Empty;
         }
 
         /// <summary>

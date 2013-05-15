@@ -55,7 +55,7 @@ namespace HtmlBuilder
 
             foreach (var element in _elements)
             {
-                element.Classes.AddRange(names);
+                element.Classes += names.Aggregate("", (cur, cls) => cur + " " + cls).Trim();
             }
 
             return this;
@@ -115,7 +115,7 @@ namespace HtmlBuilder
 
             // Not possible to instantiate an HtmlBuilder without having 
             // at least one element be generated... assume this is safe
-            _elements.First().Id = id;
+            _elements.First().Attributes["id"] = id;
 
             return this;
         }
@@ -185,7 +185,6 @@ namespace HtmlBuilder
 
         //public HtmlBuilder AppendText(string text)
         //{
-
         //    return this;
         //}
 

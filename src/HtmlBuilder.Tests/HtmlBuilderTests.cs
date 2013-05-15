@@ -10,18 +10,6 @@ namespace HtmlBuilder.Tests
     [TestClass]
     public class HtmlBuilderTests
     {
-        private const string _div = "div";
-        private const string _span = "span";
-        private const string _id = "unique";
-        private const string _id2 = "fail";
-        private const string _class = "test-class";
-        private const string _class2 = "test-class2";
-        private const string _cssClass = ".test-class";
-        private const string _cssClass2 = ".test-class2";
-        private const string _attr = "test";
-        private const string _attrValue = "true";
-
-
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void HtmlBuilder_WithEmptySelectorPassed_ShouldThrowArgumentException()
@@ -33,7 +21,7 @@ namespace HtmlBuilder.Tests
         [TestMethod]
         public void HtmlBuilder_WithTagNamePassed_ShouldRenderTag()
         {
-            var html = new HtmlBuilder(_div);
+            var html = new HtmlBuilder("div");
 
             Assert.AreEqual("<div></div>", html.ToString());
         }
@@ -49,58 +37,64 @@ namespace HtmlBuilder.Tests
         [TestMethod]
         public void HtmlBuilder_WithIdPassed_ShouldRenderDivWithId()
         {
-            var html = new HtmlBuilder("#" + _id);
+            const string id = "unique";
+            var html = new HtmlBuilder("#" + id);
 
-            Assert.AreEqual("<div id=\"" + _id + "\"></div>", html.ToString());
+            Assert.AreEqual("<div id=\"" + id + "\"></div>", html.ToString());
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void HtmlBuilder_WithMultipleIds_ShouldThrowArgumentException()
         {
-            var html = new HtmlBuilder("#" + _id + "#" + _id2);
+            var html = new HtmlBuilder("#one#two");
             html.ToString();
         }
 
         [TestMethod]
         public void HtmlBuilder_WithClassPassed_ShouldRenderDivWithClass()
         {
-            var html = new HtmlBuilder(_cssClass);
+            const string cls = "item";
+            var html = new HtmlBuilder("." + cls);
 
-            Assert.AreEqual("<div class=\"" + _class + "\"></div>", html.ToString());
+            Assert.AreEqual("<div class=\"" + cls + "\"></div>", html.ToString());
         }
 
         [TestMethod]
         public void HtmlBuilder_WithTagNameClass_ShouldRenderTagWithClass()
         {
-            var html = new HtmlBuilder(_span + _cssClass);
+            const string cls = "item";
+            var html = new HtmlBuilder("span." + cls);
 
-            Assert.AreEqual("<" + _span + " class=\"" + _class + "\"></" + _span + ">", html.ToString());
+            Assert.AreEqual("<span class=\"" + cls + "\"></span>", html.ToString());
         }
 
         [TestMethod]
         public void HtmlBuilder_WithMultipleClasses_ShouldRenderDivWithMultipleClasses()
         {
-            var html = new HtmlBuilder(_cssClass + _cssClass2);
+            const string one = "one";
+            const string two = "two";
+            var html = new HtmlBuilder("." + one + "." + two);
 
-            // Tag builder reverses the classes...
-            Assert.AreEqual("<div class=\"" + _class2 + " " + _class + "\"></div>", html.ToString());
+            Assert.AreEqual("<div class=\"" + one + " " + two + "\"></div>", html.ToString());
         }
 
         [TestMethod]
         public void HtmlBuilder_WithAttributeWithNoValue_ShouldRenderDivWithTheAttributeName()
         {
-            var html = new HtmlBuilder("[" + _attr + "]");
+            const string disabled = "disabled";
+            var html = new HtmlBuilder("[" + disabled + "]");
 
-            Assert.AreEqual("<div " + _attr + "=\"\"></div>", html.ToString());
+            Assert.AreEqual("<div " + disabled + "=\"\"></div>", html.ToString());
         }
 
         [TestMethod]
         public void HtmlBuilder_WithAttributeWithValue_ShouldRenderDivWithAttribute()
         {
-            var html = new HtmlBuilder("[" + _attr + "='" + _attrValue + "']");
+            const string disabled = "disabled";
+            var html = new HtmlBuilder("[" + disabled + "='" + disabled + "']");
 
-            Assert.AreEqual("<div " + _attr + "=\"" + _attrValue + "\"></div>", html.ToString());
+            Assert.AreEqual("<div " + disabled + "=\"" + disabled + "\"></div>", html.ToString());
         }
 
         [TestMethod]
