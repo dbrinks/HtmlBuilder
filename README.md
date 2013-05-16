@@ -8,7 +8,7 @@ The syntax is modeled after [Emmet](http://emmet.io/) (formerly Zencoding), so i
 ##Features
 
 * Easily create complex html using a modified CSS selector syntax modeled after [Emmet](http://emmet.io/).
-* Fluent API to modify an existing
+* More in development!
 
 ##Usage
 
