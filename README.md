@@ -85,7 +85,8 @@ Throw it all together...
 ```csharp
 var list = new HtmlBuilder("ul#my-list>li.list-item*5>a[href]");
 
-/*
+/* Formatted this so it's easier to read.
+
 <ul id="my-list">
     <li class="list-item"><a href=""></a></li>
     <li class="list-item"><a href=""></a></li>
