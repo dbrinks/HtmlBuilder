@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using HtmlBuilder.Models;
+using HtmlBuilder.Extensions;
 
 namespace HtmlBuilder
 {
@@ -13,7 +14,93 @@ namespace HtmlBuilder
         private static readonly Regex _countRegex = new Regex(@"\*\s*[0-9]+", RegexOptions.Singleline | RegexOptions.Compiled);
         private static readonly Regex _attributeRegex = new Regex(@"\[([^\]~\$\*\^\|\!]+)(=[^\]]+)?\]", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
 
+        public SelectorTokens Parse(string selector)
+        {
+            return new SelectorTokens
+                {
+                    Tag = ParseTag(selector),
+                    Attributes = ParseAttributes(selector),
+                    Count = ParseCount(selector)
+                };
+        }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        private static int ParseCount(string selector)
+        {
+            var countMatches = _countRegex.Matches(selector);
+
+            if (countMatches.Count > 1)
+            {
+                throw new ArgumentException();
+            }
+
+            var count = 1;
+
+            if (countMatches.Count > 0)
+            {
+                count = int.Parse(countMatches[0].Value.TrimStart('*'));
+            }
+
+            return count;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        private static string ParseTag(string selector)
+        {
+            return selector.SubstringUntil(0, _specialCharacters);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        private static string ParseId(string selector)
+        {
+            return _idRegex.Matches(selector).ToIDString();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        private static string ParseClasses(string selector)
+        {
+            return _classRegex.Matches(selector).ToCSSClassString();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        private static Dictionary<string, string> ParseAttributes(string selector)
+        {
+            var attributeDict = _attributeRegex.Matches(selector).ToAttributeDictionary();
+            var id = ParseId(selector);
+            var classes = ParseClasses(selector);
+
+            if (!string.IsNullOrEmpty(id))
+            {
+                attributeDict.Add("id", id);
+            }
+
+            if (!string.IsNullOrEmpty(classes))
+            {
+                attributeDict.Add("class", classes);
+            }
+
+            return attributeDict;
+        }
     }
 
     public class SelectorTokens
@@ -22,8 +109,6 @@ namespace HtmlBuilder
 
         public Dictionary<string, string> Attributes { get; set; }
 
-        public List<Node> Children { get; set; }
-
-        public List<Node> Siblings { get; set; }
+        public int Count { get; set; }
     }
 }

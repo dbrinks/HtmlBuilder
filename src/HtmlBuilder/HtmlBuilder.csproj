@@ -35,6 +35,7 @@
     <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\MatchCollectionExtensions.cs" />
     <Compile Include="Extensions\NodeExtensions.cs" />
     <Compile Include="Models\NodeTree.cs" />
     <Compile Include="Models\TagNode.cs" />
@@ -44,7 +45,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="HtmlTreeBuilder.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
-    <Compile Include="TagTokenizer.cs" />
+    <Compile Include="SelectorTokenizer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
