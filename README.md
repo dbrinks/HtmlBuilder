@@ -3,7 +3,7 @@ HtmlBuilder
 
 HtmlBuilder is an alternative to TagBuilder that allows you to use CSS selectors in order to generate complex, well-formed HTML.
 
-The syntax is modeled after [Emmet](http://emmet.io/) (formerly Zencoding), so if you use either of those tools when writing HTML, HtmlBuilder should feel very familiar to you.
+The syntax is modeled after [Emmet](http://emmet.io/),formerly Zen Coding, so if you use either of those tools when writing HTML, HtmlBuilder should feel very familiar to you.
 
 ##Features
 
@@ -106,7 +106,7 @@ Still in development
 HtmlBuilder is still in development.  Here are a few things I am still working on.
 
 * Expand on the current API.
-* Support text in a selector by writing `{Some Words}`.
+* Support text in a selector by using curly braces `{Some Words}`.
 * Support grouping elements by using parenthesis `(label+input)*2`.
 * Easy to read debug HTML output with new lines and decent formatting.
 * Traverse the HTML tree created by your selector (break all the things).

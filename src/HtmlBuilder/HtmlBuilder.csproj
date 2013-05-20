@@ -33,18 +33,18 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HtmlElement.cs" />
+    <Compile Include="Extensions\NodeExtensions.cs" />
+    <Compile Include="Models\NodeTree.cs" />
+    <Compile Include="Models\TagNode.cs" />
     <Compile Include="HtmlBuilder.cs" />
+    <Compile Include="Models\Node.cs" />
+    <Compile Include="Models\TextNode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SelectorParser.cs" />
-    <Compile Include="StringExtensions.cs" />
+    <Compile Include="HtmlTreeBuilder.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="TagTokenizer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

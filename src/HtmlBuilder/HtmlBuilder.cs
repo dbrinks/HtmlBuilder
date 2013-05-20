@@ -1,21 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Mvc;
+using HtmlBuilder.Extensions;
+using HtmlBuilder.Models;
 
 // Settings Ideas...
 //
 // Self closing tags if possible
-//
-//
+// Set self closing tags
+// 
 
 namespace HtmlBuilder
 {
     public class HtmlBuilder
     {
-        public string Selector { get; set; }
-        private List<HtmlElement> _elements;
-        private readonly SelectorParser _parser;
+        private readonly Node _root;
+        private Node _current;
+        private List<Node> _elements;
+
+        private readonly string _selector;
+        private readonly HtmlTreeBuilder _builder;
 
         /// <summary>
         /// 
@@ -23,15 +27,75 @@ namespace HtmlBuilder
         /// <param name="selector"></param>
         public HtmlBuilder(string selector)
         {
-            _parser = new SelectorParser();
-            Selector = selector;
+            _builder = new HtmlTreeBuilder();
+            _selector = selector;
 
             if (string.IsNullOrEmpty(selector))
             {
                 throw new ArgumentException();
             }
 
-            _elements = _parser.Parse(Selector);
+            _elements = _builder.Build(_selector);
+
+            // Something MUST be returned
+            _root = _elements[0];
+            _current = _root;
+        }
+
+
+        /// <summary>
+        /// Returns the HtmlBuidler as a string, causing all of the elements
+        /// too be rendered immediately.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return _elements.Aggregate("", (cur, el) => cur + el.ToString());
+        }
+
+
+        #region API
+
+
+
+        public HtmlBuilder Parent()
+        {
+            if (_current.Parent != null)
+            {
+                _current = _current.Parent;
+            }
+
+            return this;
+        }
+
+        public HtmlBuilder Previous()
+        {
+            if (_current.PreviousSibling != null)
+            {
+                _current = _current.PreviousSibling;
+            }
+
+            return this;
+        }
+
+        public HtmlBuilder Next()
+        {
+            if (_current.NextSibling != null)
+            {
+                _current = _current.NextSibling;
+            }
+
+            return this;
+        }
+
+        public HtmlBuilder Children()
+        {
+            if (_current.Children != null)
+            {
+                _current = _current.Children.First();
+            }
+
+            return this;
         }
 
         /// <summary>
@@ -53,9 +117,9 @@ namespace HtmlBuilder
         {
             var names = classNames as string[] ?? classNames.ToArray();
 
-            foreach (var element in _elements)
+            foreach (var element in _elements.OfType<TagNode>())
             {
-                element.Classes += names.Aggregate("", (cur, cls) => cur + " " + cls).Trim();
+                element.Classes = names.Aggregate("", (cur, cls) => cur + " " + cls).Trim();
             }
 
             return this;
@@ -89,11 +153,11 @@ namespace HtmlBuilder
         /// <returns></returns>
         public HtmlBuilder AddAttributes(Dictionary<string, string> keyValuePairs)
         {
-            foreach (var element in _elements)
+            foreach (var element in _elements.OfType<TagNode>())
             {
                 foreach (var kvp in keyValuePairs.Where(pairs => !string.IsNullOrEmpty(pairs.Key)))
                 {
-                    element.Attributes.Add(kvp.Key, kvp.Value);
+                    element.AddAttribute(kvp.Key, kvp.Value);
                 }
             }
 
@@ -108,21 +172,14 @@ namespace HtmlBuilder
         /// <returns></returns>
         public HtmlBuilder AddID(string id)
         {
-            if (_elements.Count > 1)
-            {
-                throw new ArgumentException("Cannot add the same ID to multiple elements.");
-            }
-
-            // Not possible to instantiate an HtmlBuilder without having 
-            // at least one element be generated... assume this is safe
-            _elements.First().Attributes["id"] = id;
+            _current.AsTagNode().Id = id;
 
             return this;
         }
 
         public HtmlBuilder AppendChildren(string selector)
         {
-            var children = _parser.Parse(selector);
+            var children = _builder.Build(selector);
 
             foreach (var el in _elements)
             {
@@ -134,7 +191,7 @@ namespace HtmlBuilder
 
         public HtmlBuilder PrependChildren(string selector)
         {
-            var children = _parser.Parse(selector);
+            var children = _builder.Build(selector);
 
             foreach (var el in _elements)
             {
@@ -146,11 +203,11 @@ namespace HtmlBuilder
 
         public HtmlBuilder ReplaceChildren(string selector)
         {
-            var children = _parser.Parse(selector);
+            var children = _builder.Build(selector);
 
             foreach (var el in _elements)
             {
-                el.Children = children;
+                el.Children = new List<Node>(children);
             }
 
             return this;
@@ -158,7 +215,7 @@ namespace HtmlBuilder
 
         public HtmlBuilder Append(string selector)
         {
-            var elements = _parser.Parse(selector);
+            var elements = _builder.Build(selector);
 
             _elements.AddRange(elements);
 
@@ -167,7 +224,7 @@ namespace HtmlBuilder
 
         public HtmlBuilder Prepend(string selector)
         {
-            var elements = _parser.Parse(selector);
+            var elements = _builder.Build(selector);
 
             _elements.InsertRange(0, elements);
 
@@ -176,7 +233,7 @@ namespace HtmlBuilder
 
         public HtmlBuilder Replace(string selector)
         {
-            var elements = _parser.Parse(selector);
+            var elements = _builder.Build(selector);
 
             _elements = elements;
 
@@ -197,15 +254,6 @@ namespace HtmlBuilder
         //{
         //    return this;
         //}
-
-        /// <summary>
-        /// Returns the HtmlBuidler as a string, causing all of the elements
-        /// too be rendered immediately.
-        /// </summary>
-        /// <returns></returns>
-        public override string ToString()
-        {
-            return _elements.Aggregate("", (cur, el) => cur + el.ToString());
-        }
+        #endregion
     }
 }

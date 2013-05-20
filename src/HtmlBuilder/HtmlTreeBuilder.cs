@@ -2,30 +2,31 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using HtmlBuilder.Models;
 
 namespace HtmlBuilder
 {
-    public class SelectorParser
+    public class HtmlTreeBuilder
     {
         private static readonly char[] _specialCharacters = new[] { '#', '.', '[', ']', '>', '{', '}', '*', '+' };
-        private static readonly Regex _idRegex = new Regex(@"#([a-zA-Z0-9_\-]+)", RegexOptions.IgnoreCase | RegexOptions.Singleline);
-        private static readonly Regex _textRegex = new Regex(@"\{(.+)\}", RegexOptions.IgnoreCase | RegexOptions.Singleline);
-        private static readonly Regex _classRegex = new Regex(@"\.([a-zA-Z0-9_\-]+)", RegexOptions.IgnoreCase | RegexOptions.Singleline);
-        private static readonly Regex _countRegex = new Regex(@"\*\s*[0-9]+", RegexOptions.Singleline);
-        private static readonly Regex _attributeRegex = new Regex(@"\[([^\]~\$\*\^\|\!]+)(=[^\]]+)?\]", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+        private static readonly Regex _idRegex = new Regex(@"#([a-zA-Z0-9_\-]+)", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
+        private static readonly Regex _textRegex = new Regex(@"\{(.+)\}", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
+        private static readonly Regex _classRegex = new Regex(@"\.([a-zA-Z0-9_\-]+)", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
+        private static readonly Regex _countRegex = new Regex(@"\*\s*[0-9]+", RegexOptions.Singleline | RegexOptions.Compiled);
+        private static readonly Regex _attributeRegex = new Regex(@"\[([^\]~\$\*\^\|\!]+)(=[^\]]+)?\]", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
 
-        public SelectorParser() { }
+
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="selector"></param>
         /// <returns></returns>
-        public List<HtmlElement> Parse(string selector)
+        public List<Node> Build(string selector)
         {
-            var elements = new List<HtmlElement>();
-            List<HtmlElement> children = null;
-            List<HtmlElement> siblings = null;
+            var elements = new List<Node>();
+            List<Node> children = null;
+            List<Node> siblings = null;
 
             selector = selector.Trim();
 
@@ -33,7 +34,7 @@ namespace HtmlBuilder
 
             if (childSelectorIndex >= 0)
             {
-                children = Parse(selector.Substring(childSelectorIndex + 1));
+                children = Build(selector.Substring(childSelectorIndex + 1));
                 selector = selector.Substring(0, childSelectorIndex).Trim();
             }
 
@@ -41,7 +42,7 @@ namespace HtmlBuilder
 
             if (siblingSelectorIndex >= 0)
             {
-                siblings = Parse(selector.Substring(siblingSelectorIndex + 1));
+                siblings = Build(selector.Substring(siblingSelectorIndex + 1));
                 selector = selector.Substring(0, siblingSelectorIndex).Trim();
             }
 
@@ -67,13 +68,12 @@ namespace HtmlBuilder
             return elements;
         }
 
-
         /// <summary>
         /// 
         /// </summary>
         /// <param name="selector"></param>
         /// <returns></returns>
-        private static HtmlElement CreateElement(string selector)
+        private static TagNode CreateElement(string selector)
         {
             var attr = ParseAttributes(selector);
             var id = ParseId(selector);
@@ -85,11 +85,10 @@ namespace HtmlBuilder
             if (!string.IsNullOrEmpty(classes))
                 attr.Add("class", classes);
 
-            return new HtmlElement
-                {
-                    TagName = ParseTag(selector),
-                    Attributes = attr
-                };
+            var node = new TagNode(ParseTag(selector));
+            node.SetAttributes(attr);
+
+            return node;
         }
 
         /// <summary>

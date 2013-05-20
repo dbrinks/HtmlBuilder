@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HtmlBuilder.Tests
@@ -10,8 +9,7 @@ namespace HtmlBuilder.Tests
     [TestClass]
     public class HtmlBuilderTests
     {
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void HtmlBuilder_WithEmptySelectorPassed_ShouldThrowArgumentException()
         {
             var html = new HtmlBuilder(string.Empty);
@@ -43,8 +41,7 @@ namespace HtmlBuilder.Tests
             Assert.AreEqual("<div id=\"" + id + "\"></div>", html.ToString());
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void HtmlBuilder_WithMultipleIds_ShouldThrowArgumentException()
         {
             var html = new HtmlBuilder("#one#two");
@@ -131,114 +128,6 @@ namespace HtmlBuilder.Tests
                 "<li class=\"items\"><a href=\"/SomeURL\"></a></li>" +
                 "<li class=\"items\"><a href=\"/SomeURL\"></a></li>" +
             "</ul>", html.ToString());
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void HtmlBuilder_AddID_OnMultipleElements_ShouldThrowArgumentException()
-        {
-            new HtmlBuilder("div*2").AddID("isUnique");
-        }
-
-        [TestMethod]
-        public void HtmlBuilder_AddID_ShouldAddAnIDToTheElement()
-        {
-            const string id = "isUnique";
-            var html = new HtmlBuilder("div").AddID(id);
-
-            Assert.AreEqual("<div id=\"" + id + "\"></div>", html.ToString());
-        }
-
-        [TestMethod]
-        public void HtmlBuilder_AddCSSClass_ShouldAddClassToElement()
-        {
-            var html = new HtmlBuilder("div").AddCSSClass("testing");
-
-            Assert.AreEqual("<div class=\"testing\"></div>", html.ToString());
-        }
-
-        [TestMethod]
-        public void HtmlBuilder_AddAttribute_ShouldAddAttributeToElement()
-        {
-            const string key = "href";
-            const string value = "/Home";
-            var html = new HtmlBuilder("a").AddAttribute(key, value);
-
-            Assert.AreEqual("<a " + key + "=\"" + value + "\"></a>", html.ToString());
-        }
-
-        [TestMethod]
-        public void HtmlBuilder_AddAttribute_WithEmptyKeyName_ShouldNotAddAttributeToElement()
-        {
-            const string key = "";
-            const string value = "/Home";
-            var html = new HtmlBuilder("a").AddAttribute(key, value);
-
-            Assert.AreEqual("<a></a>", html.ToString());
-        }
-
-        [TestMethod]
-        public void HtmlBuilder_AddAttributeKeyValuePair_ShouldAddAttributeToElement()
-        {
-            var kvp = new KeyValuePair<string, string>("href", "/Home");
-
-            var html = new HtmlBuilder("a").AddAttribute(kvp);
-
-            Assert.AreEqual("<a " + kvp.Key + "=\"" + kvp.Value + "\"></a>", html.ToString());
-        }
-
-        [TestMethod]
-        public void HtmlBuilder_AppendChildren_ShouldAppendChildren()
-        {
-            // probably you would never do this... but it works for tests
-            var html = new HtmlBuilder("div>p").AppendChildren("a");
-
-            Assert.AreEqual("<div><p></p><a></a></div>", html.ToString());
-        }
-
-        [TestMethod]
-        public void HtmlBuilder_PrependChildren_ShouldPrependChildren()
-        {
-            // probably you would never do this... but it works for tests
-            var html = new HtmlBuilder("div>p").PrependChildren("a");
-
-            Assert.AreEqual("<div><a></a><p></p></div>", html.ToString());
-        }
-
-        [TestMethod]
-        public void HtmlBuilder_ReplaceChildren_ShouldReplaceChildren()
-        {
-            // probably you would never do this... but it works for tests
-            var html = new HtmlBuilder("div>p").ReplaceChildren("a");
-
-            Assert.AreEqual("<div><a></a></div>", html.ToString());
-        }
-
-        [TestMethod]
-        public void HtmlBuilder_Append_ShouldReplaceElements()
-        {
-            // probably you would never do this... but it works for tests
-            var html = new HtmlBuilder("div").Append("span");
-
-            Assert.AreEqual("<div></div><span></span>", html.ToString());
-        }
-
-        [TestMethod]
-        public void HtmlBuilder_Prepend_ShouldReplaceElements()
-        {
-            // probably you would never do this... but it works for tests
-            var html = new HtmlBuilder("div").Prepend("span");
-
-            Assert.AreEqual("<span></span><div></div>", html.ToString());
-        }
-
-        [TestMethod]
-        public void HtmlBuilder_Replace_ShouldReplaceElements()
-        {
-            // probably you would never do this... but it works for tests
-            var html = new HtmlBuilder("div").Replace("span");
-
-            Assert.AreEqual("<span></span>", html.ToString());
         }
     }
 }
