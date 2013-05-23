@@ -41,13 +41,6 @@ namespace HtmlBuilder.Tests
             Assert.AreEqual("<div id=\"" + id + "\"></div>", html.ToString());
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
-        public void HtmlBuilder_WithMultipleIds_ShouldThrowArgumentException()
-        {
-            var html = new HtmlBuilder("#one#two");
-            html.ToString();
-        }
-
         [TestMethod]
         public void HtmlBuilder_WithClassPassed_ShouldRenderDivWithClass()
         {

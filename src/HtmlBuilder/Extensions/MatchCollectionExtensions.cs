@@ -10,7 +10,7 @@ namespace HtmlBuilder.Extensions
         {
             return matches.Cast<Match>()
                           .Select(m => m.Value.Split('='))
-                          .ToDictionary(s => s[0].Trim('['),
+                          .ToDictionary(s => s[0].Trim(new[] { '[', ']' }),
                                         s => s.Count() > 1
                                             ? s[1].ReplaceQuotes().Trim(']')
                                             : string.Empty);

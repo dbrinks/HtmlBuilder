@@ -38,6 +38,7 @@
     <Compile Include="Extensions\MatchCollectionExtensions.cs" />
     <Compile Include="Extensions\NodeExtensions.cs" />
     <Compile Include="Models\NodeTree.cs" />
+    <Compile Include="Models\SelectorTokens.cs" />
     <Compile Include="Models\TagNode.cs" />
     <Compile Include="HtmlBuilder.cs" />
     <Compile Include="Models\Node.cs" />
