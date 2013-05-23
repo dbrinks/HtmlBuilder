@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using HtmlBuilder.Extensions;
+using HtmlBuilder.Models;
 
 namespace HtmlBuilder
 {
-    public class SelectorTokenizer
+    public static class SelectorTokenizer
     {
         private static readonly char[] _specialCharacters = new[] { '#', '.', '[', ']', '>', '{', '}', '*', '+' };
         private static readonly Regex _idRegex = new Regex(@"#([a-zA-Z0-9_\-]+)", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
@@ -14,7 +15,12 @@ namespace HtmlBuilder
         private static readonly Regex _countRegex = new Regex(@"\*\s*[0-9]+", RegexOptions.Singleline | RegexOptions.Compiled);
         private static readonly Regex _attributeRegex = new Regex(@"\[([^\]~\$\*\^\|\!]+)(=[^\]]+)?\]", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
 
-        public SelectorTokens Parse(string selector)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        public static SelectorTokens Parse(string selector)
         {
             return new SelectorTokens
                 {
@@ -35,7 +41,7 @@ namespace HtmlBuilder
 
             if (countMatches.Count > 1)
             {
-                throw new ArgumentException();
+                throw new ArgumentException("Selectors can only contain one multiplier (*) per group");
             }
 
             var count = 1;
@@ -101,14 +107,5 @@ namespace HtmlBuilder
 
             return attributeDict;
         }
-    }
-
-    public class SelectorTokens
-    {
-        public string Tag { get; set; }
-
-        public Dictionary<string, string> Attributes { get; set; }
-
-        public int Count { get; set; }
     }
 }

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace HtmlBuilder.Extensions
 {
@@ -22,7 +19,8 @@ namespace HtmlBuilder.Extensions
         public static string ToCSSClassString(this MatchCollection matches)
         {
             return matches.Cast<Match>()
-                          .Aggregate("", (current, match) => current + " " + match.Value.TrimStart('.'));
+                          .Aggregate("", (current, match) => current + " " + match.Value.TrimStart('.'))
+                          .Trim();
         }
 
         public static string ToIDString(this MatchCollection matches)
