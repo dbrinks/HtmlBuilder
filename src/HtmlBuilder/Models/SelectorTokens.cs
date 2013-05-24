@@ -8,6 +8,10 @@ namespace HtmlBuilder.Models
 
         public Dictionary<string, string> Attributes { get; set; }
 
+        public string ChildSelector { get; set; }
+
+        public string NextSiblingSelector { get; set; }
+
         public int Count { get; set; }
     }
 }

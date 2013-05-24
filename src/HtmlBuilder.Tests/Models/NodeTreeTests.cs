@@ -28,32 +28,12 @@ namespace HtmlBuilder.Tests
             Assert.AreEqual(node, tree.Current);
         }
 
-        //[TestMethod]
-        //[ExpectedException(typeof(ArgumentNullException))]
-        //public void Constuctor_WithNullNodeList_ShouldThrowArgumentNullException()
-        //{
-        //    List<Node> nodes = null;
-        //    var tree = new NodeTree(nodes);
-        //}
-
-        //[TestMethod]
-        //[ExpectedException(typeof(ArgumentException))]
-        //public void Constuctor_WithEmptyNodeList_ShouldThrowArgumentException()
-        //{
-        //    var nodes = new List<Node>();
-        //    var tree = new NodeTree(nodes);
-        //}
-
-        //[TestMethod]
-        //public void Constuctor_WithNodeList_Should()
-        //{
-        //    var nodes = GetNodeList();
-        //    var tree = new NodeTree(nodes);
-
-        //    CollectionAssert.AreEqual(nodes, tree.Nodes);
-        //    Assert.AreEqual(nodes.First(), tree.Root);
-        //    Assert.AreEqual(nodes.First(), tree.Current);
-        //}
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Constuctor_WithNullNodeList_ShouldThrowArgumentNullException()
+        {
+            var tree = new NodeTree(null);
+        }
 
         [TestMethod]
         public void Next_WithNodeThatHasNextSibling_ShouldReturnTrueAndMoveCurrentToCurrentsNextSibling()
@@ -170,6 +150,36 @@ namespace HtmlBuilder.Tests
 
             Assert.IsFalse(result);
             Assert.AreEqual(node, tree.Current);
+        }
+
+        [TestMethod]
+        public void ToString_WithNodeWithoutChildrenOrSiblings_ShouldReturnASimpleNode()
+        {
+            var node = GetTagNode();
+            var tree = new NodeTree(node);
+
+            Assert.AreEqual("<div></div>", tree.ToString());
+        }
+
+        [TestMethod]
+        public void ToString_WithNodeWithSiblings_ShouldReturnANodeWithSiblings()
+        {
+            var next = GetTagNode();
+            var node = GetTagNodeWithNextSibling(next);
+            var tree = new NodeTree(node);
+
+            Assert.AreEqual("<div></div><div></div>", tree.ToString());
+        }
+
+        [TestMethod]
+        public void ToString_WithNodeWithChildren_ShouldReturnANodeWithChildren()
+        {
+            var first = GetTagNode();
+            var last = GetTagNode();
+            var node = GetTagNodeWithChildren(first, last);
+            var tree = new NodeTree(node);
+
+            Assert.AreEqual("<div><div></div><div></div></div>", tree.ToString());
         }
 
         #region Static Helpers

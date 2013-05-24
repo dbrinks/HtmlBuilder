@@ -1,7 +1,7 @@
 HtmlBuilder
 ===========
 
-HtmlBuilder is an alternative to TagBuilder that allows you to use CSS selectors in order to generate complex, well-formed HTML.
+HtmlBuilder is an alternative to TagBuilder that allows you to use CSS selectors to generate complex, well-formed HTML.
 
 The syntax is modeled after [Emmet](http://emmet.io/),formerly Zen Coding, so if you use either of those tools when writing HTML, HtmlBuilder should feel very familiar to you.
 

@@ -37,6 +37,8 @@
   <ItemGroup>
     <Compile Include="Extensions\MatchCollectionExtensions.cs" />
     <Compile Include="Extensions\NodeExtensions.cs" />
+    <Compile Include="IHtmlTreeBuilder.cs" />
+    <Compile Include="ISelectorTokenizer.cs" />
     <Compile Include="Models\NodeTree.cs" />
     <Compile Include="Models\SelectorTokens.cs" />
     <Compile Include="Models\TagNode.cs" />

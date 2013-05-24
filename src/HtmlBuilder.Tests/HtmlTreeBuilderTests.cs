@@ -1,64 +1,140 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using HtmlBuilder.Extensions;
 using HtmlBuilder.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
 namespace HtmlBuilder.Tests
 {
     [TestClass]
     public class HtmlTreeBuilderTests
     {
-        private HtmlTreeBuilder Builder;
-
-        [TestInitialize]
-        public void Initialize()
-        {
-            Builder = new HtmlTreeBuilder();
-        }
+        private HtmlTreeBuilder _builder;
 
         [TestMethod]
-        public void Parse_WithChildSelector_ShouldReturnAnElementWithAChildElement()
+        public void Build_WithChildSelector_ShouldReturnAnElementWithAChildElement()
         {
             const string elName = "div";
             const string childName = "span";
+            const string selector = elName + ">" + childName;
 
-            var element = Builder.Build(elName + ">" + childName).First();
+            var mock = new Mock<ISelectorTokenizer>();
+            mock.Setup(tokenizer => tokenizer.Parse(selector))
+                .Returns(new SelectorTokens
+                {
+                    Tag = elName,
+                    ChildSelector = childName,
+                    Count = 1
+                });
+            mock.Setup(tokenizer => tokenizer.Parse(childName))
+                .Returns(new SelectorTokens
+                {
+                    Tag = childName,
+                    Count = 1
+                });
 
-            Assert.IsInstanceOfType(element, typeof(TagNode));
-            Assert.AreEqual(elName, element.AsTagNode().TagName);
-            Assert.IsInstanceOfType(element.Children.First(), typeof(TagNode));
-            Assert.AreEqual(childName, element.Children.First().AsTagNode().TagName);
+            SetUpBuilder(mock.Object);
+
+            var tree = _builder.Build(elName + ">" + childName);
+
+            mock.Verify(tokenizer => tokenizer.Parse(It.IsAny<string>()), Times.Exactly(2));
+            Assert.IsInstanceOfType(tree.Current, typeof(TagNode));
+            Assert.AreEqual(elName, tree.Current.AsTagNode().TagName);
+            Assert.IsInstanceOfType(tree.Current.Children.First(), typeof(TagNode));
+            Assert.AreEqual(childName, tree.Current.Children.First().AsTagNode().TagName);
         }
 
         [TestMethod]
-        public void Parse_WithSiblingSelector_ShouldReturnTwoTopLevelElements()
+        public void Build_WithSiblingSelector_ShouldReturnTwoTopLevelElements()
         {
             const string el = "div";
             const string sibling = "span";
+            const string selector = el + "+" + sibling;
 
-            var elements = Builder.Build(el + "+" + sibling);
+            var mock = new Mock<ISelectorTokenizer>();
+            mock.Setup(tokenizer => tokenizer.Parse(selector))
+                .Returns(() => new SelectorTokens
+                    {
+                        Tag = el,
+                        NextSiblingSelector = sibling,
+                        Count = 1
+                    });
+            mock.Setup(tokenizer => tokenizer.Parse(sibling))
+                .Returns(() => new SelectorTokens
+                    {
+                        Tag = sibling,
+                        Count = 1
+                    });
 
-            Assert.AreEqual(2, elements.Count);
-            Assert.IsInstanceOfType(elements[0], typeof(TagNode));
-            Assert.AreEqual(el, elements[0].AsTagNode().TagName);
-            Assert.IsInstanceOfType(elements[1], typeof(TagNode));
-            Assert.AreEqual(sibling, elements[1].AsTagNode().TagName);
+            SetUpBuilder(mock.Object);
+
+            var tree = _builder.Build(selector);
+
+            mock.Verify(tokenizer => tokenizer.Parse(It.IsAny<string>()), Times.Exactly(2));
+            Assert.IsInstanceOfType(tree.Current, typeof(TagNode));
+            Assert.AreEqual(el, tree.Current.AsTagNode().TagName);
+            Assert.IsInstanceOfType(tree.Current.NextSibling, typeof(TagNode));
+            Assert.AreEqual(sibling, tree.Current.NextSibling.AsTagNode().TagName);
         }
 
         [TestMethod]
-        public void Parse_WithCountSelector_ShouldReturnMultipleElements()
+        public void Build_WithCountSelector_ShouldReturnMultipleElements()
         {
-            var elements = Builder.Build("div*3");
-            Assert.AreEqual(3, elements.Count());
+            const string elName = "div";
+            const string selector = elName + "*3";
+
+            var mock = new Mock<ISelectorTokenizer>();
+            mock.Setup(tokenizer => tokenizer.Parse(selector))
+                .Returns(() => new SelectorTokens
+                    {
+                        Tag = elName,
+                        Count = 3
+                    });
+
+            SetUpBuilder(mock.Object);
+
+            var tree = _builder.Build(selector);
+
+            mock.Verify(tokenizer => tokenizer.Parse(It.IsAny<string>()), Times.Once());
+            Assert.AreEqual(elName, tree.Current.AsTagNode().TagName);
+            Assert.AreEqual(elName, tree.Current.NextSibling.AsTagNode().TagName);
+            Assert.AreEqual(elName, tree.Current.NextSibling.NextSibling.AsTagNode().TagName);
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
-        public void Parse_WithMultiCountSelectors_ShouldThrowArgumentException()
+        [TestMethod]
+        public void Build_WithMultiplierAndSibling_ShouldReturnXNodesPlusOneOtherNode()
         {
-            Builder.Build("a*3*4");
+            const string elName = "div";
+            const string sibling = "span";
+            const string selector = elName + "*2+" + sibling;
+
+            var mock = new Mock<ISelectorTokenizer>();
+            mock.Setup(tokenizer => tokenizer.Parse(selector))
+                .Returns(() => new SelectorTokens
+                    {
+                        Tag = elName,
+                        NextSiblingSelector = sibling,
+                        Count = 2
+                    });
+            mock.Setup(tokenizer => tokenizer.Parse(sibling))
+                .Returns(() => new SelectorTokens
+                {
+                    Tag = sibling,
+                    Count = 2
+                });
+
+            SetUpBuilder(mock.Object);
+
+            var tree = _builder.Build(selector);
+
+            Assert.AreEqual(elName, tree.Current.AsTagNode().TagName);
+            Assert.AreEqual(elName, tree.Current.NextSibling.AsTagNode().TagName);
+            Assert.AreEqual(sibling, tree.Current.NextSibling.NextSibling.AsTagNode().TagName);
         }
 
+        public void SetUpBuilder(ISelectorTokenizer tokenizer)
+        {
+            _builder = new HtmlTreeBuilder(tokenizer);
+        }
     }
 }

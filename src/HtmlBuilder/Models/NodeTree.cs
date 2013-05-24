@@ -17,7 +17,7 @@ namespace HtmlBuilder.Models
             }
 
             Root = node;
-            Current = node;
+            Current = Root;
         }
 
         public bool Next()
@@ -96,6 +96,18 @@ namespace HtmlBuilder.Models
             {
                 result = false;
             }
+
+            return result;
+        }
+
+        public override string ToString()
+        {
+            var result = string.Empty;
+
+            do
+            {
+                result += Current.ToString();
+            } while (Next());
 
             return result;
         }
